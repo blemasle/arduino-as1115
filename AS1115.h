@@ -1,6 +1,8 @@
 #ifndef _AS1115_h
 #define _AS1115_h
 
+#define _AS1115_DIAGNOSTICS_
+
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
 #else
@@ -70,6 +72,21 @@ enum AS1115_FEATURE
 	BLINK_START			= 0x07
 };
 
+#ifdef _AS1115_DIAGNOSTICS_
+
+enum AS1115_DISPLAY_TEST_MODE
+{
+	DISP_TEST	= 0x00,
+	LED_SHORT	= 0x02,
+	LED_OPEN	= 0x04,
+	LED_TEST	= 0x08,
+	LED_GLOBAL	= 0x10,
+	RSET_OPEN	= 0x20,
+	RSET_SHORT	= 0x40
+};
+
+#endif
+
 inline AS1115_REGISTER operator+(AS1115_REGISTER a, byte b) {
 	return static_cast<AS1115_REGISTER>(static_cast<int>(a) + b);
 };
@@ -109,6 +126,12 @@ public:
 
 	byte readPort(byte port);
 	short read();
+
+#ifdef _AS1115_DIAGNOSTICS_
+	void visualTest(bool stop);
+	bool ledTest(AS1115_DISPLAY_TEST_MODE mode, byte[] result);
+	bool rsetTest(AS1115_DISPLAY_TEST_MODE mode);
+#endif
 }
 
 #endif

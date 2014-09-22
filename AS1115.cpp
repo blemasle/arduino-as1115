@@ -157,6 +157,54 @@ short AS1115::read()
 	return a | b << 8;
 }
 
+#ifdef _AS1115_DIAGNOSTICS_
+
+void AS1115::visualTest(bool stop)
+{
+	byte testMode = readRegister(DISPLAY_TEST_MODE);
+	if(testMode & LED_TEST) return;
+
+	testMode = stop ? testMode & ~LED_TEST : testMode | LED_TEST;
+
+	writeRegister(DISPLAY_TEST_MODE, testMode);
+}
+
+bool AS1115::ledTest(AS1115_DISPLAY_TEST_MODE mode, byte[] result)
+{
+	int i = 0;
+
+	if(mode < LED_SHORT || mode > LED_OPEN) return true;
+
+	byte testMode = readRegister(DISPLAY_TEST_MODE);
+	if(testMode & LED_TEST) return true;
+
+	writeRegister(DISPLAY_TEST_MODE, testMode | mode);
+	do {
+		delay(20);
+	}while((testMode = readRegister(DISPLAY_TEST_MODE)) & LED_TEST);
+
+	Wire.beginTransmission(_deviceAddr);
+	Wire.write(DIAG_DIGIT0);
+	Wire.endTransmission();
+	//only care about the used digits
+	Wire.requestFrom(_deviceAddr, (byte)_digits);
+	
+	while(Wire.available()) {
+		result[i] = Wire.read();
+	}
+
+	return !(testMode & LED_GLOBAL);
+}
+
+bool AS1115::rsetTest(AS1115_DISPLAY_TEST_MODE mode)
+{
+	if(mode < RSET_OPEN) return true;
+
+	return !(readRegister(DISPLAY_TEST_MODE) & mode);
+}
+
+#endif
+
 void AS1115::writeRegister(AS1115_REGISTER reg, byte value)
 {
 	Wire.beginTransmission(_deviceAddr);
