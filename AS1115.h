@@ -129,10 +129,10 @@ public:
 
 #ifdef _AS1115_DIAGNOSTICS_
 	void visualTest(bool stop);
-	bool ledTest(AS1115_DISPLAY_TEST_MODE mode, byte[] result);
+	bool ledTest(AS1115_DISPLAY_TEST_MODE mode, byte result[]);
 	bool rsetTest(AS1115_DISPLAY_TEST_MODE mode);
 #endif
-}
+};
 
 #endif
 

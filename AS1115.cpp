@@ -16,7 +16,12 @@ const byte letters[26] = { LETTERS };
 
 byte nthdigit(int value, byte n)
 {
-	return ((value / pow(10, n)) % 10);
+	int pow = 1;
+	for (int i = 0; i < n; i++) {
+		pow *= 10;
+	}
+
+	return ((value / pow) % 10);
 }
 
 AS1115::AS1115(byte addr) {
@@ -28,6 +33,11 @@ AS1115::~AS1115() {}
 void AS1115::init(byte digits, byte intensity)
 {
 	_digits = digits;
+	
+	Wire.beginTransmission(0x00);
+	Wire.write(SHUTDOWN);
+	Wire.write(NORMAL_OPERATION | RESET_FEATURE);
+	Wire.endTransmission();
 
 	if(_deviceAddr != 0x00) {
 		Wire.beginTransmission(0x00);
@@ -37,8 +47,8 @@ void AS1115::init(byte digits, byte intensity)
 	}
 
 	writeRegister(DECODE_MODE, 0x00);
-	writeRegister(SCAN_LIMIT, digits);
-	setIntensity(intensity);	
+	writeRegister(SCAN_LIMIT, digits - 1);
+	setIntensity(intensity);
 }
 
 void AS1115::setIntensity(byte intensity)
@@ -63,7 +73,7 @@ void AS1115::clear()
 	Wire.beginTransmission(_deviceAddr);
 	Wire.write(DIGIT0);  //first digit to write is #1
 
-	while(n--) {
+	while (n--) {
 		Wire.write(BLANK);
 	}
 
@@ -77,9 +87,9 @@ void AS1115::display(int value)
 	Wire.beginTransmission(_deviceAddr);
 	Wire.write(DIGIT0); //first digit to write is #1
 
-	while(n--) {
+	while (n--) {
 		Wire.write(digits[nthdigit(value, n)]);
-	}
+	};
 
 	Wire.endTransmission();
 }
@@ -137,7 +147,7 @@ void AS1115::display(const char value[])
 
 void AS1115::display(byte digit, byte value)
 {
-	writeRegister(DIGIT0 + digit, value);
+	writeRegister((AS1115_REGISTER)(DIGIT0 + digit - 1), value);
 }
 
 byte AS1115::readPort(byte port)
@@ -161,6 +171,8 @@ short AS1115::read()
 
 void AS1115::visualTest(bool stop)
 {
+	writeRegister(DISPLAY_TEST_MODE, DISP_TEST);
+	return;
 	byte testMode = readRegister(DISPLAY_TEST_MODE);
 	if(testMode & LED_TEST) return;
 
@@ -169,7 +181,7 @@ void AS1115::visualTest(bool stop)
 	writeRegister(DISPLAY_TEST_MODE, testMode);
 }
 
-bool AS1115::ledTest(AS1115_DISPLAY_TEST_MODE mode, byte[] result)
+bool AS1115::ledTest(AS1115_DISPLAY_TEST_MODE mode, byte result[])
 {
 	int i = 0;
 
