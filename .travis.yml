@@ -15,6 +15,7 @@ install:
  - ln -s $PWD /usr/local/share/arduino/libraries/$LIBRARY_NAME
 script:
  - arduino --verify --board arduino:avr:uno $PWD/examples/Counter/Counter.ino
+ - arduino --verify --board arduino:avr:uno $PWD/examples/Interrupt/Interrupt.ino
 notifications:
   email:
     on_success: change
