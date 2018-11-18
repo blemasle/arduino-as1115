@@ -1,18 +1,18 @@
 /**
- * Use 4 7 segments to display passing seconds
+ * Use 4 7 segments to display passing seconds.
  */
 
 #include <Wire.h>
 #include <AS1115.h>
 
-AS1115 _as = AS1115(0x00);
+AS1115 as = AS1115(0x00);
 long m = 0;
 
 void setup()
 {
 	Wire.begin();
-	_as.init(4, 6);
-	_as.clear();
+	as.init(4, 6);
+	as.clear();
 }
 
 void loop()
@@ -22,5 +22,5 @@ void loop()
 	}
 
 	m = millis();
-	_as.display(m / 1000);
+	as.display(m / 1000);
 }
