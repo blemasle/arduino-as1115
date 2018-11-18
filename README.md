@@ -12,3 +12,15 @@ Reading the 16 keys state is also supported.
  * Variable display intensity.
  * Read the staet of the 16 keys at once.
  * Support for low power Shutdown mode
+
+## Usage
+Unlike most Arduino library, no default instance is created when the library is included. It's up to you to create one with the appropriate chip I2C address.
+
+```cpp
+#include <Arduino.h>
+#include <AS1115.h>
+
+AS1115 as = AS1115(0x00);
+```
+
+See included examples for furher usage.
