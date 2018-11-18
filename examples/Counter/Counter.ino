@@ -1,3 +1,7 @@
+/**
+ * Use 4 7 segments to display passing seconds
+ */
+
 #include <Wire.h>
 #include <AS1115.h>
 
