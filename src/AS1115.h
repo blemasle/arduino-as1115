@@ -1,7 +1,7 @@
 #ifndef _AS1115_h
 #define _AS1115_h
 
-#define _AS1115_DIAGNOSTICS_
+#define _AS1115_DIAGNOSTICS_ ///< Enables diagnostics fuctions.
 
 #if defined(ARDUINO) && ARDUINO >= 100
 #include "Arduino.h"
@@ -10,6 +10,9 @@
 #endif
 #include <Wire.h>
 
+/**
+ * Digits registers.
+ */
 enum AS1115_DIGIT
 {
 	DIGIT0	= 0x01,
@@ -19,40 +22,47 @@ enum AS1115_DIGIT
 	DIGIT4	= 0x05,
 	DIGIT5	= 0x06,
 	DIGIT6	= 0x07,
-	DIGIT8	= 0x08
+	DIGIT7	= 0x08
 };
 
+/**
+ * Registers addresses.
+ * See "Digits- and control-Registers".
+ */
 enum AS1115_REGISTER
 {
-	DECODE_MODE			= 0x09,
-	GLOBAL_INTENSITY	= 0x0A,
-	SCAN_LIMIT			= 0x0B,
-	SHUTDOWN			= 0x0C,
-	SELF_ADDRESSING		= 0x2D,
-	FEATURE				= 0x0E,
-	DISPLAY_TEST_MODE	= 0x0F,
-	DIG01_INTENSITY		= 0x10,
-	DIG23_INTENSITY		= 0x11,
-	DIG45_INTENSITY		= 0x12,
-	DIG67_INTENSITY		= 0x13,
-	DIAG_DIGIT0			= 0x14,
-	DIAG_DIGIT1			= 0x15,
-	DIAG_DIGIT2			= 0x16,
-	DIAG_DIGIT3			= 0x17,
-	DIAG_DIGIT4			= 0x18,
-	DIAG_DIGIT5			= 0x19,
-	DIAG_DIGIT6			= 0x1A,
-	DIAG_DIGIT7			= 0x1B,
-	KEY_A				= 0x1C,
-	KEY_B				= 0x1D
+	DECODE_MODE			= 0x09,	///< Sets the decode mode (BCD or HEX).
+	GLOBAL_INTENSITY	= 0x0A, ///< Sets the entire display intensity.
+	SCAN_LIMIT			= 0x0B,	///< Controls how many digits are to be displayed.
+	SHUTDOWN			= 0x0C,	///<
+	SELF_ADDRESSING		= 0x2D,	///< Uses 2 of the 16 keys to change the device's address.
+	FEATURE				= 0x0E,	///< Enables various features such as clock mode and blinking.
+	DISPLAY_TEST_MODE	= 0x0F,	///< Detects open or shorted LEDs.
+	DIG01_INTENSITY		= 0x10,	///< Sets the display intensity for digit 0 and 1.
+	DIG23_INTENSITY		= 0x11, ///< Sets the display intensity for digit 2 and 3.
+	DIG45_INTENSITY		= 0x12, ///< Sets the display intensity for digit 4 and 5.
+	DIG67_INTENSITY		= 0x13, ///< Sets the display intensity for digit 6 and 7.
+	DIAG_DIGIT0			= 0x14, ///< Gets the results of the LEDS open/short test for digit 0.
+	DIAG_DIGIT1			= 0x15,	///< Gets the results of the LEDS open/short test for digit 1.
+	DIAG_DIGIT2			= 0x16,	///< Gets the results of the LEDS open/short test for digit 2.
+	DIAG_DIGIT3			= 0x17,	///< Gets the results of the LEDS open/short test for digit 3.
+	DIAG_DIGIT4			= 0x18,	///< Gets the results of the LEDS open/short test for digit 4.
+	DIAG_DIGIT5			= 0x19,	///< Gets the results of the LEDS open/short test for digit 5.
+	DIAG_DIGIT6			= 0x1A,	///< Gets the results of the LEDS open/short test for digit 6.
+	DIAG_DIGIT7			= 0x1B,	///< Gets the results of the LEDS open/short test for digit 7.
+	KEY_A				= 0x1C,	///< Gets the result of the debounced keyscan for KEYA.
+	KEY_B				= 0x1D	///< Gets the result of the debounced keyscan for KEYB.
 };
 
+/**
+ * SHUTDOWN register flags.
+ */
 enum AS1115_SHUTDOWN_MODE
 {
-	SHUTDOWN_MODE		= 0x00,
-	NORMAL_OPERATION	= 0x01,
-	RESET_FEATURE		= 0x00,
-	PRESERVE_FEATURE	= 0x80
+	SHUTDOWN_MODE		= 0x00,	///< Shutdown and reset FEATURE register to default settings.
+	NORMAL_OPERATION	= 0x01,	///< Resume operation and reset FEATURE register to default settings.
+	RESET_FEATURE		= 0x00,	///< FEATURE register is resetted to default settings.
+	PRESERVE_FEATURE	= 0x80	///< FEATURE register is unchanged.
 };
 
 enum AS1115_DECODE_SEL
@@ -61,28 +71,34 @@ enum AS1115_DECODE_SEL
 	HEX_DECODING		= 0x01
 };
 
+/**
+ * FEATURE register bits.
+ */
 enum AS1115_FEATURE
 {
-	CLOCK_ACTIVE		= 0x00,
-	RESET_ALL			= 0x01,
-	DECODE_SEL			= 0x02,
-	BLINK_ENABLE		= 0x04,
-	BLINK_FREQ_SEL		= 0x05,
-	SYNC				= 0x06,
-	BLINK_START			= 0x07
+	CLOCK_ACTIVE		= 0x00,	///< Enables the external clock.
+	RESET_ALL			= 0x01, ///< Resets all control register except the FEATURE register.
+	DECODE_SEL			= 0x02, ///< Enable Code-B or HEX decoding for the selected digits.
+	BLINK_ENABLE		= 0x04,	///< Enables blinking.
+	BLINK_FREQ_SEL		= 0x05,	///< Sets the blinking frequency.
+	SYNC				= 0x06,	///< Synchronize blinking with LD/CS pin.
+	BLINK_START			= 0x07	///< Sets wether to start the blinking with the display turned on or off.
 };
 
 #ifdef _AS1115_DIAGNOSTICS_
 
+/**
+ * DISPLAY_TEST_MODE register bits.
+ */
 enum AS1115_DISPLAY_TEST_MODE
 {
-	DISP_TEST	= 0x00,
-	LED_SHORT	= 0x02,
-	LED_OPEN	= 0x04,
-	LED_TEST	= 0x08,
-	LED_GLOBAL	= 0x10,
-	RSET_OPEN	= 0x20,
-	RSET_SHORT	= 0x40
+	DISP_TEST	= 0x00,	///< Optical display test.
+	LED_SHORT	= 0x02,	///< Starts a test for shorted LEDs.
+	LED_OPEN	= 0x04,	///< Starts a test for open LEDs.
+	LED_TEST	= 0x08,	///< Indicates an ongoing open/short LED test.
+	LED_GLOBAL	= 0x10,	///< Indicates that the last open/short LED test has detected an error.
+	RSET_OPEN	= 0x20,	///< Checks if external resistor Rset is open.
+	RSET_SHORT	= 0x40	///< Checks if external resistor Rset is shorted.
 };
 
 #endif
@@ -113,23 +129,66 @@ public:
 #ifdef _DEBUG
 	void debug();
 #endif
+	/**
+	 * Inits the device with n digits and the specified intensity.
+	 * See setIntensity.
+	 */
 	void init(byte digits, byte intensity);
+	/**
+	 * Sets the global intensity of the display from 0 to 15.
+	 */
 	void setIntensity(byte intensity);
 
+	/**
+	 * Shutdowns the device. Depending on preserve value, FEATURE register will be resetted.
+	 */
 	void shutdown(bool preserve);
+	/**
+	 * Resume normal operation after a shutdown. Depending on preserve value, FEATURE register will be resetted.
+	 */
 	void resume(bool preserve);
 
+	/**
+	 * Clears all digits of the display.
+	 */
 	void clear();
+	/**
+	 * Display on integer on the display.
+	 */
 	void display(int value);
+	/**
+	 * Display a string on the display. Note that '.' in the string will be displayed on the following digit.
+	 */
 	void display(const char value[]);
+	/**
+	 * Directly write a value to the corresponding digit register.
+	 */
 	void display(byte digit, byte value);
 
+	/**
+	 * Reads the debounced keyscan of the specified port. Active inputs are logic-low.
+	 * Note that if self addressing is used, the two LSB of port A are always inactive (high).
+	 */
 	byte readPort(byte port);
+	/**
+	 * Reads the debounced keyscan of both ports. Port B is the high byte.
+	 * See readPort(byte port).
+	 */
 	short read();
 
 #ifdef _AS1115_DIAGNOSTICS_
+
+	/**
+	 * Starts or stops a visual test.
+	 */
 	void visualTest(bool stop);
+	/**
+	 * Starts a test for open or shorted LEDs depending and mode, and return the result.
+	 */
 	bool ledTest(AS1115_DISPLAY_TEST_MODE mode, byte result[]);
+	/**
+	 * Checks if Rset is open or shorted Rset.
+	 */
 	bool rsetTest(AS1115_DISPLAY_TEST_MODE mode);
 #endif
 };
