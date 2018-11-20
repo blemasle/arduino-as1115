@@ -11,26 +11,26 @@
 #define BLANK	0x00
 
 //TODO : to be save in flash memory ??
-const byte digits[16] = { DIGITS };
-const byte letters[26] = { LETTERS };
+const uint8_t digits[16] = { DIGITS };
+const uint8_t letters[26] = { LETTERS };
 
-byte nthdigit(int value, byte n)
+uint8_t nthdigit(uint16_t value, uint8_t n)
 {
-	int pow = 1;
-	for (int i = 0; i < n; i++) {
+	uint16_t pow = 1;
+	for (uint8_t i = 0; i < n; i++) {
 		pow *= 10;
 	}
 
 	return ((value / pow) % 10);
 }
 
-AS1115::AS1115(byte addr) {
+AS1115::AS1115(uint8_t addr) {
 	_deviceAddr = addr;
 }
 
 AS1115::~AS1115() {}
 
-void AS1115::init(byte digits, byte intensity)
+void AS1115::init(uint8_t digits, uint8_t intensity)
 {
 	_digits = digits;
 	
@@ -51,7 +51,7 @@ void AS1115::init(byte digits, byte intensity)
 	setIntensity(intensity);
 }
 
-void AS1115::setIntensity(byte intensity)
+void AS1115::setIntensity(uint8_t intensity)
 {
 	writeRegister(GLOBAL_INTENSITY, intensity);
 }
@@ -80,9 +80,9 @@ void AS1115::clear()
 	Wire.endTransmission();
 }
 
-void AS1115::display(int value) 
+void AS1115::display(uint16_t value) 
 {
-	int n = _digits;
+	uint8_t n = _digits;
 
 	Wire.beginTransmission(_deviceAddr);
 	Wire.write(DIGIT0); //first digit to write is #1
@@ -96,15 +96,15 @@ void AS1115::display(int value)
 
 void AS1115::display(const char value[])
 {
-	int n = _digits;
-	int len = strlen(value);
+	uint8_t n = _digits;
+	size_t len = strlen(value);
 	char c;
-	byte modifier = BLANK;
+	uint8_t modifier = BLANK;
 
 	Wire.beginTransmission(_deviceAddr);
 	Wire.write(DIGIT0); //first char to write is #1
 
-	for(int i = 0; i < n; i++)
+	for(uint8_t i = 0; i < n; i++)
 	{
 		if(i >= len)
 		{
@@ -145,14 +145,14 @@ void AS1115::display(const char value[])
 	Wire.endTransmission();
 }
 
-void AS1115::display(byte digit, byte value)
+void AS1115::display(uint8_t digit, uint8_t value)
 {
 	writeRegister((AS1115_REGISTER)(DIGIT0 + digit - 1), value);
 }
 
-byte AS1115::readPort(byte port)
+uint8_t AS1115::readPort(uint8_t port)
 {
-	byte value = readRegister(KEY_A + port);
+	uint8_t value = readRegister(KEY_A + port);
 	//self-adrressing disable the two LSB of KEY_A 
 	if(port == 0 && _deviceAddr != 0x00) return value && 0xFC;
 
@@ -161,8 +161,8 @@ byte AS1115::readPort(byte port)
 
 short AS1115::read()
 {
-	byte a = readPort(0);
-	byte b = readPort(1);
+	uint8_t a = readPort(0);
+	uint8_t b = readPort(1);
 
 	return a | b << 8;
 }
@@ -171,20 +171,18 @@ short AS1115::read()
 
 void AS1115::visualTest(bool stop)
 {
-	byte testMode = readRegister(AS1115_REGISTER::DISPLAY_TEST_MODE);
+	uint8_t testMode = readRegister(AS1115_REGISTER::DISPLAY_TEST_MODE);
 	if(stop) bitClear(testMode, DISP_TEST);
 	else bitSet(testMode, DISP_TEST);
 	
 	writeRegister(DISPLAY_TEST_MODE, DISP_TEST);
 }
 
-bool AS1115::ledTest(AS1115_DISPLAY_TEST_MODE mode, byte result[])
+bool AS1115::ledTest(AS1115_DISPLAY_TEST_MODE mode, uint8_t result[])
 {
-	int i = 0;
-
 	if(mode && (_BV(LED_SHORT) || _BV(LED_OPEN)) != mode) return true;
 
-	byte testMode = readRegister(DISPLAY_TEST_MODE);
+	uint8_t testMode = readRegister(DISPLAY_TEST_MODE);
 	if(testMode & _BV(LED_TEST)) return true;
 
 	writeRegister(DISPLAY_TEST_MODE, testMode | mode);
@@ -196,8 +194,9 @@ bool AS1115::ledTest(AS1115_DISPLAY_TEST_MODE mode, byte result[])
 	Wire.write(DIAG_DIGIT0);
 	Wire.endTransmission();
 	//only care about the used digits
-	Wire.requestFrom(_deviceAddr, (byte)_digits);
+	Wire.requestFrom(_deviceAddr, (uint8_t)_digits);
 	
+	uint8_t i = 0;
 	while(Wire.available()) {
 		result[i] = Wire.read();
 	}
@@ -214,7 +213,7 @@ bool AS1115::rsetTest(AS1115_DISPLAY_TEST_MODE mode)
 
 #endif
 
-void AS1115::writeRegister(AS1115_REGISTER reg, byte value)
+void AS1115::writeRegister(AS1115_REGISTER reg, uint8_t value)
 {
 	Wire.beginTransmission(_deviceAddr);
 	Wire.write(reg);
@@ -222,11 +221,11 @@ void AS1115::writeRegister(AS1115_REGISTER reg, byte value)
 	Wire.endTransmission();
 }
 
-byte AS1115::readRegister(AS1115_REGISTER reg)
+uint8_t AS1115::readRegister(AS1115_REGISTER reg)
 {
 	Wire.beginTransmission(_deviceAddr);
 	Wire.write(reg);
 	Wire.endTransmission();
-	Wire.requestFrom(_deviceAddr, (byte)1);
+	Wire.requestFrom(_deviceAddr, (uint8_t)1);
 	return Wire.read();
 }
