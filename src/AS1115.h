@@ -71,13 +71,13 @@ enum AS1115_DECODE_SEL
  */
 enum AS1115_FEATURE
 {
-	CLOCK_ACTIVE		= 0x00,	///< Enables the external clock.
-	RESET_ALL			= 0x01, ///< Resets all control register except the FEATURE register.
-	DECODE_SEL			= 0x02, ///< Enable Code-B or HEX decoding for the selected digits.
-	BLINK_ENABLE		= 0x04,	///< Enables blinking.
-	BLINK_FREQ_SEL		= 0x05,	///< Sets the blinking frequency.
-	SYNC				= 0x06,	///< Synchronize blinking with LD/CS pin.
-	BLINK_START			= 0x07	///< Sets wether to start the blinking with the display turned on or off.
+	CLOCK_ACTIVE		= 0,	///< Enables the external clock.
+	RESET_ALL			= 1, 	///< Resets all control register except the FEATURE register.
+	DECODE_SEL			= 2, 	///< Enable Code-B or HEX decoding for the selected digits.
+	BLINK_ENABLE		= 4,	///< Enables blinking.
+	BLINK_FREQ_SEL		= 5,	///< Sets the blinking frequency.
+	SYNC				= 6,	///< Synchronize blinking with LD/CS pin.
+	BLINK_START			= 7		///< Sets wether to start the blinking with the display turned on or off.
 };
 
 #ifdef _AS1115_DIAGNOSTICS_
@@ -87,13 +87,13 @@ enum AS1115_FEATURE
  */
 enum AS1115_DISPLAY_TEST_MODE
 {
-	DISP_TEST	= 0x00,	///< Optical display test.
-	LED_SHORT	= 0x02,	///< Starts a test for shorted LEDs.
-	LED_OPEN	= 0x04,	///< Starts a test for open LEDs.
-	LED_TEST	= 0x08,	///< Indicates an ongoing open/short LED test.
-	LED_GLOBAL	= 0x10,	///< Indicates that the last open/short LED test has detected an error.
-	RSET_OPEN	= 0x20,	///< Checks if external resistor Rset is open.
-	RSET_SHORT	= 0x40	///< Checks if external resistor Rset is shorted.
+	DISP_TEST	= 0,	///< Optical display test.
+	LED_SHORT	= 1,	///< Starts a test for shorted LEDs.
+	LED_OPEN	= 2,	///< Starts a test for open LEDs.
+	LED_TEST	= 3,	///< Indicates an ongoing open/short LED test.
+	LED_GLOBAL	= 4,	///< Indicates that the last open/short LED test has detected an error.
+	RSET_OPEN	= 5,	///< Checks if external resistor Rset is open.
+	RSET_SHORT	= 6		///< Checks if external resistor Rset is shorted.
 };
 
 #endif
@@ -188,4 +188,3 @@ public:
 
 #endif
 };
-

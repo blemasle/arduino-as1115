@@ -171,29 +171,26 @@ short AS1115::read()
 
 void AS1115::visualTest(bool stop)
 {
+	byte testMode = readRegister(AS1115_REGISTER::DISPLAY_TEST_MODE);
+	if(stop) bitClear(testMode, DISP_TEST);
+	else bitSet(testMode, DISP_TEST);
+	
 	writeRegister(DISPLAY_TEST_MODE, DISP_TEST);
-	return;
-	byte testMode = readRegister(DISPLAY_TEST_MODE);
-	if(testMode & LED_TEST) return;
-
-	testMode = stop ? testMode & ~LED_TEST : testMode | LED_TEST;
-
-	writeRegister(DISPLAY_TEST_MODE, testMode);
 }
 
 bool AS1115::ledTest(AS1115_DISPLAY_TEST_MODE mode, byte result[])
 {
 	int i = 0;
 
-	if(mode < LED_SHORT || mode > LED_OPEN) return true;
+	if(mode && (_BV(LED_SHORT) || _BV(LED_OPEN)) != mode) return true;
 
 	byte testMode = readRegister(DISPLAY_TEST_MODE);
-	if(testMode & LED_TEST) return true;
+	if(testMode & _BV(LED_TEST)) return true;
 
 	writeRegister(DISPLAY_TEST_MODE, testMode | mode);
 	do {
 		delay(20);
-	}while((testMode = readRegister(DISPLAY_TEST_MODE)) & LED_TEST);
+	}while((testMode = readRegister(DISPLAY_TEST_MODE)) & _BV(LED_TEST));
 
 	Wire.beginTransmission(_deviceAddr);
 	Wire.write(DIAG_DIGIT0);
@@ -205,7 +202,7 @@ bool AS1115::ledTest(AS1115_DISPLAY_TEST_MODE mode, byte result[])
 		result[i] = Wire.read();
 	}
 
-	return !(testMode & LED_GLOBAL);
+	return !(testMode & _BV(LED_GLOBAL));
 }
 
 bool AS1115::rsetTest(AS1115_DISPLAY_TEST_MODE mode)
