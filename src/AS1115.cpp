@@ -199,6 +199,7 @@ bool AS1115::ledTest(AS1115_DISPLAY_TEST_MODE mode, uint8_t result[])
 	uint8_t i = 0;
 	while(Wire.available()) {
 		result[i] = Wire.read();
+		i++;
 	}
 
 	return !(testMode & _BV(LED_GLOBAL));
