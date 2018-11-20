@@ -1,13 +1,8 @@
-#ifndef _AS1115_h
-#define _AS1115_h
+#pragma once
 
 #define _AS1115_DIAGNOSTICS_
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif
+#include <Arduino.h>
 #include <Wire.h>
 
 enum AS1115_DIGIT
@@ -131,8 +126,7 @@ public:
 	void visualTest(bool stop);
 	bool ledTest(AS1115_DISPLAY_TEST_MODE mode, byte result[]);
 	bool rsetTest(AS1115_DISPLAY_TEST_MODE mode);
-#endif
-};
 
 #endif
+};
 
