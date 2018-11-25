@@ -25,7 +25,7 @@ void setup()
 	as.clear();
     as.read(); // reset any pending interrupt on the chip side
 
-    as.display(0);
+    as.display((uint16_t)0);
 }
 
 void loop()

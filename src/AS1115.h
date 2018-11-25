@@ -71,13 +71,13 @@ enum AS1115_DECODE_SEL
  */
 enum AS1115_FEATURE
 {
-	CLOCK_ACTIVE		= 0x00,	///< Enables the external clock.
-	RESET_ALL			= 0x01, ///< Resets all control register except the FEATURE register.
-	DECODE_SEL			= 0x02, ///< Enable Code-B or HEX decoding for the selected digits.
-	BLINK_ENABLE		= 0x04,	///< Enables blinking.
-	BLINK_FREQ_SEL		= 0x05,	///< Sets the blinking frequency.
-	SYNC				= 0x06,	///< Synchronize blinking with LD/CS pin.
-	BLINK_START			= 0x07	///< Sets wether to start the blinking with the display turned on or off.
+	CLOCK_ACTIVE		= 0,	///< Enables the external clock.
+	RESET_ALL			= 1, 	///< Resets all control register except the FEATURE register.
+	DECODE_SEL			= 2, 	///< Enable Code-B or HEX decoding for the selected digits.
+	BLINK_ENABLE		= 4,	///< Enables blinking.
+	BLINK_FREQ_SEL		= 5,	///< Sets the blinking frequency.
+	SYNC				= 6,	///< Synchronize blinking with LD/CS pin.
+	BLINK_START			= 7		///< Sets wether to start the blinking with the display turned on or off.
 };
 
 #ifdef _AS1115_DIAGNOSTICS_
@@ -87,39 +87,39 @@ enum AS1115_FEATURE
  */
 enum AS1115_DISPLAY_TEST_MODE
 {
-	DISP_TEST	= 0x00,	///< Optical display test.
-	LED_SHORT	= 0x02,	///< Starts a test for shorted LEDs.
-	LED_OPEN	= 0x04,	///< Starts a test for open LEDs.
-	LED_TEST	= 0x08,	///< Indicates an ongoing open/short LED test.
-	LED_GLOBAL	= 0x10,	///< Indicates that the last open/short LED test has detected an error.
-	RSET_OPEN	= 0x20,	///< Checks if external resistor Rset is open.
-	RSET_SHORT	= 0x40	///< Checks if external resistor Rset is shorted.
+	DISP_TEST	= 0,	///< Optical display test.
+	LED_SHORT	= 1,	///< Starts a test for shorted LEDs.
+	LED_OPEN	= 2,	///< Starts a test for open LEDs.
+	LED_TEST	= 3,	///< Indicates an ongoing open/short LED test.
+	LED_GLOBAL	= 4,	///< Indicates that the last open/short LED test has detected an error.
+	RSET_OPEN	= 5,	///< Checks if external resistor Rset is open.
+	RSET_SHORT	= 6		///< Checks if external resistor Rset is shorted.
 };
 
 #endif
 
-inline AS1115_REGISTER operator+(AS1115_REGISTER a, byte b) {
-	return static_cast<AS1115_REGISTER>(static_cast<int>(a) + b);
+inline AS1115_REGISTER operator+(AS1115_REGISTER a, uint8_t b) {
+	return static_cast<AS1115_REGISTER>(static_cast<uint8_t>(a) + b);
 };
 
-inline AS1115_DIGIT operator+(AS1115_DIGIT a, byte b) {
-	return static_cast<AS1115_DIGIT>(static_cast<int>(a) + b);
+inline AS1115_DIGIT operator+(AS1115_DIGIT a, uint8_t b) {
+	return static_cast<AS1115_DIGIT>(static_cast<uint8_t>(a) + b);
 };
 
 inline AS1115_SHUTDOWN_MODE operator|(AS1115_SHUTDOWN_MODE a, AS1115_SHUTDOWN_MODE b) {
-	return static_cast<AS1115_SHUTDOWN_MODE>(static_cast<int>(a) | static_cast<int>(b));
+	return static_cast<AS1115_SHUTDOWN_MODE>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
 };
 
 class AS1115
 {
 private:
-	byte _deviceAddr;
-	byte _digits;
+	uint8_t _deviceAddr;
+	uint8_t _digits;
 
-	void writeRegister(AS1115_REGISTER reg, byte value);
-	byte readRegister(AS1115_REGISTER reg);
+	void writeRegister(AS1115_REGISTER reg, uint8_t value);
+	uint8_t readRegister(AS1115_REGISTER reg);
 public:
-	AS1115(byte addr);
+	AS1115(uint8_t addr);
 	~AS1115();
 #ifdef _DEBUG
 	void debug();
@@ -128,11 +128,11 @@ public:
 	 * Inits the device with n digits and the specified intensity.
 	 * See setIntensity.
 	 */
-	void init(byte digits, byte intensity);
+	void init(uint8_t digits, uint8_t intensity);
 	/**
 	 * Sets the global intensity of the display from 0 to 15.
 	 */
-	void setIntensity(byte intensity);
+	void setIntensity(uint8_t intensity);
 
 	/**
 	 * Shutdowns the device. Depending on preserve value, FEATURE register will be resetted.
@@ -148,9 +148,9 @@ public:
 	 */
 	void clear();
 	/**
-	 * Display on integer on the display.
+	 * Display an unsigned integer on the display.
 	 */
-	void display(int value);
+	void display(uint16_t value);
 	/**
 	 * Display a string on the display. Note that '.' in the string will be displayed on the following digit.
 	 */
@@ -158,16 +158,16 @@ public:
 	/**
 	 * Directly write a value to the corresponding digit register.
 	 */
-	void display(byte digit, byte value);
+	void display(uint8_t digit, uint8_t value);
 
 	/**
 	 * Reads the debounced keyscan of the specified port. Active inputs are logic-low.
 	 * Note that if self addressing is used, the two LSB of port A are always inactive (high).
 	 */
-	byte readPort(byte port);
+	uint8_t readPort(uint8_t port);
 	/**
-	 * Reads the debounced keyscan of both ports. Port B is the high byte.
-	 * See readPort(byte port).
+	 * Reads the debounced keyscan of both ports. Port B is the high uint8_t.
+	 * See readPort(uint8_t port).
 	 */
 	short read();
 
@@ -179,8 +179,9 @@ public:
 	void visualTest(bool stop);
 	/**
 	 * Starts a test for open or shorted LEDs depending and mode, and return the result.
+	 * The result array should be size uppon the enabled digits.
 	 */
-	bool ledTest(AS1115_DISPLAY_TEST_MODE mode, byte result[]);
+	bool ledTest(AS1115_DISPLAY_TEST_MODE mode, uint8_t result[]);
 	/**
 	 * Checks if Rset is open or shorted Rset.
 	 */
@@ -188,4 +189,3 @@ public:
 
 #endif
 };
-
