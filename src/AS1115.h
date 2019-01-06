@@ -6,6 +6,12 @@
 #include <Wire.h>
 
 /**
+ * Special characters
+ */
+#define AS1115_DOT		0x80
+#define AS1115_BLANK	0x00
+
+/**
  * Digits registers.
  */
 enum AS1115_DIGIT

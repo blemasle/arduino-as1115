@@ -7,9 +7,6 @@
 #define LETTERS			0x77, 0x1F, 0x4E, 0x3D, 0x4F, 0x47, 0x5E, 0x37, 0x30, 0x3C, 0x2F, 0x0E, 0x54, \
                         0x15, 0x1D, 0x67, 0x73, 0x05, 0x5B, 0x0F, 0x3E, 0x1C, 0x2A, 0x49, 0x3B, 0x25
 
-#define DOT		0x80
-#define BLANK	0x00
-
 //TODO : to be save in flash memory ??
 const uint8_t digits[16] = { DIGITS };
 const uint8_t letters[26] = { LETTERS };
@@ -74,7 +71,7 @@ void AS1115::clear()
 	Wire.write(DIGIT0);  //first digit to write is #1
 
 	while (n--) {
-		Wire.write(BLANK);
+		Wire.write(AS1115_BLANK);
 	}
 
 	Wire.endTransmission();
@@ -99,7 +96,7 @@ void AS1115::display(const char value[])
 	uint8_t n = _digits;
 	size_t len = strlen(value);
 	char c;
-	uint8_t modifier = BLANK;
+	uint8_t modifier = AS1115_BLANK;
 
 	Wire.beginTransmission(_deviceAddr);
 	Wire.write(DIGIT0); //first char to write is #1
@@ -108,7 +105,7 @@ void AS1115::display(const char value[])
 	{
 		if(i >= len)
 		{
-			Wire.write(BLANK);
+			Wire.write(AS1115_BLANK);
 		}
 
 		c = value[i];
@@ -117,11 +114,11 @@ void AS1115::display(const char value[])
 		{
 			i++; //skip next char as handled on this iteration
 			n++; //handle one extra char
-			modifier = DOT;
+			modifier = AS1115_DOT;
 		}
-		else if(modifier != BLANK) //rewrite value only if != default
+		else if(modifier != AS1115_BLANK) //rewrite value only if != default
 		{
-			modifier = BLANK;
+			modifier = AS1115_BLANK;
 		}
 
 		if(c >= 'A' && c <= 'Z')
@@ -138,7 +135,7 @@ void AS1115::display(const char value[])
 		}
 		else if(c == ' ')
 		{
-			Wire.write(BLANK);
+			Wire.write(AS1115_BLANK);
 		}
 	}
 
